@@ -1,0 +1,16 @@
+{
+  "name": "rekt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fortress.loans": "yarn marp src/fortress.loans.md -o build/fortress.loans/index.html",
+    "fortress.loans:pdf": "CHROME_PATH=$(which brave) yarn marp --pdf src/fortress.loans.md -o build/fortress.loans/fortress.loans.pdf"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@marp-team/marp-cli": "^2.0.0"
+  }
+}
