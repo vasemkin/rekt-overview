@@ -46,13 +46,13 @@ Fortress Protocol, кредитное подразделение JetFuel Finance
 
 ## Введение
 
-Утром, 9 мая, Fortress Protocol подвергся хакерской атаке. Основной причиной атаки послужил изъян в governance-контракте и the манипуляции с оркалом Umbrella Network.
+Утром, 9 мая, Fortress Protocol подвергся хакерской атаке. Основными причинами атаки послужили изъян в governance-контракте и уязвимость оракула Umbrella Network.
 
 ---
 
 ## tl;dr || DYOR
 
-Fortress -- это алгоритмический денежный рынок и протокол синтетических стейблкоинов, предназначенный для безопасного и надежного кредитования и кредитования пользователей в Binance Smart Chain.
+Fortress -- это алгоритмический денежный рынок и протокол синтетических стейблкоинов, предназначенный для безопасного и надежного кредитования пользователей в Binance Smart Chain.
 
 Адреса, задействованные в атаке, перечислены ниже:
 
@@ -67,7 +67,7 @@ Fortress -- это алгоритмический денежный рынок и
 
 Подготовка к атаке началась [как минимум за 19 дней](https://etherscan.io/txs?a=0xA6AF2872176320015f8ddB2ba013B38Cb35d22Ad) до совершения.
 
-29 апреля хакер [получил 20ETH на TornadoCash](https://etherscan.io/tx/0x1f1b43b6a56698af777c8c8b7e70eb77f10ff08bd8518c1685b9c19528e3daa5) (протокол для осуществления частных транзакций в сети Ethereum, простыми словами миксер), и отправил 12.4ETH на BSC, используя [Cbridge](https://cbridge.celer.network/#/transfer).
+29 апреля хакер [получил 20 ETH на TornadoCash](https://etherscan.io/tx/0x1f1b43b6a56698af777c8c8b7e70eb77f10ff08bd8518c1685b9c19528e3daa5) (протокол для осуществления частных транзакций в сети Ethereum, простыми словами миксер), и отправил 12.4 ETH на BSC, используя [Cbridge](https://cbridge.celer.network/#/transfer).
 
 Стоит заметить что [выведены деньги были тем же способом.](https://etherscan.io/tx/0x36a0cdb1403ec2026b3878e23cec8904d142ef4b81c6fdeec0b694d7cb0c19c9)
 
@@ -83,7 +83,7 @@ Fortress -- это алгоритмический денежный рынок и
 
 [$FTS](https://bscscan.com/address/0x4437743ac02957068995c48e08465e0ee1769fbe) -- governance токен Fortress Protocol. Он был выпущен 21 апреля 2022 года с в количестве 10,000,000.
 
-Благодаря низкой цене $FTS хакер потратил всего 11.4 ETH на покупку 400,000 $FTS tokens, что представляет из себя 4% всего supply.
+Благодаря низкой цене $FTS, хакер потратил всего 11.4 ETH на покупку 400,000 $FTS, что представляет из себя 4% всего supply.
 
 ---
 
@@ -118,11 +118,11 @@ function state(uint proposalId) public view returns (ProposalState) {
 
 ---
 
-## Контракт с атакой
+## Вредоносный контракт
 
-После окончания голосования, пропоузал проходит одобрение с периодом ожидания в два дня перед запуском.
+После окончания голосования, пропоузал проходит одобрение. Для вступления в силу нужно подождать два дня.
 
-Спустя два дня, 9-го Мая, пользователь создает атакующий контракт и официально запускает атаку.
+Спустя два дня, 9-го мая, пользователь создает еще один вредоносный контракт и официально запускает атаку.
 
 Заключается она в изменении кредитного плеча $FTS с `0` до `0.7`. Это позволяет хакеру использовать 70% ценности приобритенных токенов для выпуска кредитов от лица протокола.
 
@@ -130,16 +130,14 @@ function state(uint proposalId) public view returns (ProposalState) {
 
 ## Collateral price contract
 
-Fortress [контракт для цен](https://bscscan.com/address/0x00fcF33BFa9e3fF791b2b819Ab2446861a318285), который обращается к разным ораклам для разных токенов
+Fortress Protocol использует [контракт для цен](https://bscscan.com/address/0x00fcF33BFa9e3fF791b2b819Ab2446861a318285), который обращается к разным ораклам для разных токенов
 
 ```js
 function getPrice(address underlying) internal view returns (uint) {
         // ... if statements for other tokens
         } else if (underlying == FTS_ADDRESS) {
-            // Handle Umbrella supported tokens.
             return getUmbrellaPrice(ftsKey);
         else {
-            // Handle Chainlink supported tokens.
             return getChainlinkPrice(getFeed(underlying));
         }
     }
@@ -163,15 +161,13 @@ for (; i < _v.length; i++) {
       power += balance; // no need for safe math, if we overflow then we will not have enough power
     }
     require(i >= requiredSignatures, "not enough signatures"); // <---!!
-    // we turn on power once we have proper DPoS
-    // require(power * 100 / staked >= 66, "not enough power was gathered");
 ```
 
 ---
 
 ## Уязвимость Umbrella
 
-Пока количество подписей превышает значение `requiredSignatures`, проверка того, имеет ли подписавший право на цену, не выполняется. Это позволяет злоумышленнику создать подпись с любой учетной записью, чтобы указать цену.
+Пока количество подписей превышает значение `requiredSignatures`, проверка того, имеет ли подписавший право выставлять цену актива, не выполняется. Это позволило хакеру обойти вспе проверки и указать цену $FTS, которая выгодна ему.
 
 После атаки Umbrella Network исправила уязвимость и выпустила [обновленный контракт](https://bscscan.com/address/0x49D0D57cf6697b6a44050872CDb760945B710Aab).
 
